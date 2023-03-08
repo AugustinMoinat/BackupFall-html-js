@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Backup fall simulator</title>
+
+  <script src="script-add-webbing.js"></script>
+  <script src="script-configure-setup.js"></script>
+  <script src="script-do-the-maths.js"></script>
+  <script src="script-make-output.js"></script>
+  <script
+    type="text/javascript"
+    src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"
+  ></script>
+  <script
+    type="text/javascript"
+    src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"
+  ></script>
+  <style>
+    .webbing {
+      border: 1px solid;
+      padding: 0.5rem;
+    }
+    .section {
+      border: 1px solid;
+      padding: 0.5rem;
+    }
+    .space {
+      margin: 1rem;
+    }
+    .smallspace {
+      margin: 0.5rem;
+    }
+    .minispace {
+      margin: 0.2rem;
+    }
+    .bigspace {
+      margin: 2rem;
+    }
+    .right {
+      position: absolute;
+      right: 2rem;
+    }
+    .center {
+      text-align: center;
+    }
+    input[type="number"] {
+      width: 55px;
+      text-align: right;
+    }
+    .inline-block {
+      display: inline-block;
+    }
+    .danger {
+      background-color: rgb(238, 84, 84);
+    }
+    .warning {
+      background-color: rgb(241, 191, 52);
+    }
+    .info {
+      background-color: rgb(84, 238, 117);
+    }
+    .infosection {
+      background-color: rgb(84, 238, 117);
+      border: 1px solid;
+      padding: 0.5rem;
+    }
+    tr:nth-child(odd) {
+      background: #ccc;
+    }
+    tr:nth-child(even) {
+      background: #fff;
+    }
+    img {
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body onload="initW();initS()">
+  <h1 class="bigspace center">Highline Backup fall simulator</h1>
+  <p class="center">
+    <b
+      >Highlining is a dangerous sport, coding and thinking you know eveything
+      is worse!</b
+    >
+  </p>
+  <p class="center">
+    Make sure to <b>read all the text</b>. It should contain all the information
+    necessary to understand how this page works.
+  </p>
+  <p class="center">
+    Please understand that this simulation has
+    <b>not been validated by real life tests</b> yet.
+  </p>
+  <p class="center">
+    I believe the calculations to be correct, but any results that come out of
+    this model should be taken with caution. It it only a tool to help take
+    decisions, not a safety measure.
+  </p>
+  <p class="center"><b>Welcome to the simulation</b></p>
+  <h2 class="bigspace">Webbings specification</h2>
+  <p class="space">
+    For each webbing, specify the weight in grams per meter (important for long
+    set-ups), the stretch in percentage, and the force in kN at which this
+    stretch is measured. You can also change the name of the webbings at your
+    convenience. A set of default webbings loads automatically, but you can
+    entirely customize them.
+  </p>
+  <form id="inputwebbing">
+    <div id="webs"></div>
+    <br />
+    <button
+      type="button"
+      class="btn btn-outline-primary btn-sm smallspace"
+      onclick="addWebbing();updateWebbings();updateWebbingsForSetup()"
+    >
+      Add a webbing type
+    </button>
+    <p class="smallspace">
+      You can save webbings to your browser's memory, and load them from there
+      too.
+    </p>
+    <p class="smallspace">
+      Saving will replace previously saved webbings by the current ones.
+    </p>
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-success smallspace"
+      onclick="saveWebbings();updateWebbingsForSetup()"
+    >
+      Save webbings
+    </button>
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-success smallspace"
+      onclick="loadWebbings();updateWebbingsForSetup()"
+    >
+      Load webbings
+    </button>
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-success smallspace"
+      onclick="defaultWebbings();updateWebbingsForSetup()"
+    >
+      Default webbings
+    </button>
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-danger smallspace"
+      onclick="removeWebbings()"
+    >
+      Clear memory
+    </button>
+  </form>
+
+  <h2 class="bigspace">Setup construction</h2>
+
+  <form id="inputSetup">
+    <div class="infosection">
+      <div class="inline-block">
+        Setups from browser memory:
+        <select
+          class="smallspace"
+          name="setupName"
+          id="setupName"
+          onchange="loadSetup(setupName.value)"
+          #setupName
+        ></select>
+      </div>
+      <div class="inline-block">
+        <input
+          type="button"
+          class="btn btn-sm btn-outline-primary smallspace"
+          onclick="loadSetup(setupName.value)"
+          value="Reload setup"
+        />
+        <input
+          type="button"
+          class="btn btn-sm btn-outline-danger smallspace"
+          onclick="deleteSetup(setupName.value)"
+          value="Delete setup"
+        />
+        <input
+          type="button"
+          class="danger smallspace"
+          onclick="deleteAllSetups()"
+          value="Delete All Setups"
+        />
+      </div>
+      <div class="inline-block center">
+        Indicate a name to save the setup to your browser's memory:
+        <input class="smallspace" type="text" id="nameSetup" #nameSetup />
+        <input
+          type="button"
+          class="btn btn-sm btn-outline-success smallspace"
+          onclick="saveSetup(nameSetup.value)"
+          value="Save setup"
+        />
+      </div>
+    </div>
+    <p class="smallspace">
+      Enter below each section of your setup, in order. For each section,
+      specify the type of webbing of the mainline and the backup line, from the
+      list you created above. Specify also the length of each segment. Specify
+      whether there is a mainline/backup line connection between the segments.
+    </p>
+    <p class="smallspace">
+      For a mainline/backup line <b>connection in the middle of a section</b>
+      (e.g. T-loop), split that into two different sections for the
+      modelisation, with a connection in the middle.
+    </p>
+    <p class="smallspace">
+      <b>Do not worry</b> about the exact total length of your setup for now,
+      you can adjust the tension later.
+    </p>
+
+    <div id="secs"></div>
+    <div class="minispace center">
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-primary smallspace"
+        onclick="addSection()"
+      >
+        Add a section
+      </button>
+    </div>
+    <p class="smallspace">
+      When you are done, select which section(s) of mainline will fail when we
+      run the simulation.
+    </p>
+  </form>
+
+  <h2 class="space">Spot specification</h2>
+  <form id="inputSpot">
+    <div class="center smallspace">
+      <label for="L"> Gap length (m) :</label>
+      <input type="number" step="10" id="L" min="0" value="100" #L />
+    </div>
+    <div class="center smallspace">
+      <div class="inline-block center minispace">
+        <label for="h1"> height left side (m) :</label>
+        <input type="number" step="1" id="h1" min="0" value="50" />
+      </div>
+      <div class="inline-block center minispace">
+        <label for="h2"> height right side (m) :</label>
+        <input type="number" step="1" id="h2" min="0" value="50" />
+      </div>
+    </div>
+  </form>
+
+  <h2 class="space">
+    Rig your line
+    <input
+      type="button"
+      class="smallspace"
+      value="Compute standing tension"
+      onclick="standingTension(getAllNumbers(getSectionIds(),getWebbings()))"
+    />
+  </h2>
+  <p class="smallspace">
+    Adjust the tension of your line as you would in a real spot: by pulling in
+    some of the webbing on either side. Use decimals to tune exactly your
+    tension.
+  </p>
+  <form id="inputRigging">
+    <div class="center space" id="T"></div>
+    <div class="center">
+      <div class="inline-block smallspace">
+        <div class="inline-block" class="btn-group center">
+          <input
+            type="button"
+            class="btn btn-sm btn-outline-primary"
+            value="Pull"
+            onclick="pullLeft(leftIncrement.value, getSectionIds(),getWebbings());"
+          />
+          <input
+            type="button"
+            class="btn btn-sm btn-outline-primary"
+            value="Release"
+            onclick="releaseLeft(leftIncrement.value, getSectionIds(),getWebbings());"
+          />
+        </div>
+        <div class="inline-block">
+          <input
+            type="number"
+            step="0.1"
+            id="leftIncrement"
+            min="0.1"
+            value="0.5"
+            #leftIncrement
+          />
+          <label for="leftIncrements">m on the left.</label>
+        </div>
+      </div>
+      <div class="inline-block center smallspace">
+        <div class="inline-block" class="btn-group center">
+          <input
+            type="button"
+            class="btn btn-sm btn-outline-primary"
+            value="Pull"
+            onclick="pullRight(rightIncrement.value, getSectionIds(),getWebbings());"
+          />
+          <input
+            type="button"
+            class="btn btn-sm btn-outline-primary"
+            value="Release"
+            onclick="releaseRight(rightIncrement.value, getSectionIds(),getWebbings());"
+          />
+        </div>
+        <div class="inline-block">
+          <input
+            type="number"
+            step="0.1"
+            id="rightIncrement"
+            min="0.1"
+            value="0.5"
+            #rightIncrement
+          />
+          <label for="h1">m on the right.</label>
+        </div>
+      </div>
+    </div>
+  </form>
+  <p class="smallspace info" id="emptySetupParagraph"></p>
+
+  <h2 class="bigspace">Slackliner</h2>
+  <p class="smallspace">
+    Describe the slackliner, their position on the line, and the height of their
+    bounce.
+  </p>
+  <form id="inputSlacker">
+    <div class="smallspace center">
+      <div class="inline-block center minispace">
+        <label for="w"> Weight (kg) :</label>
+        <input type="number" step="1" id="w" value="75" min="1" />
+      </div>
+      <div class="inline-block center minispace">
+        <label for="h"> Height (m) :</label>
+        <input type="number" step="0.1" id="h" value="1.8" min="0.1" />
+      </div>
+      <div class="inline-block center minispace">
+        <label for="ll"> Leash length (m) :</label>
+        <input type="number" step="0.1" id="ll" value="1.2" min="0" />
+      </div>
+    </div>
+    <div class="smallspace center">
+      <div class="inline-block center minispace">
+        <label for="pos"> Distance from left anchor (m) :</label>
+        <input
+          type="number"
+          step="1"
+          id="pos"
+          value="50"
+          min="0"
+          max="L.value"
+        />
+      </div>
+      <div class="inline-block center minispace">
+        <label for="b"> Bounce amplitude (m) :</label>
+        <input type="number" step="0.5" id="b" value="0" />
+      </div>
+    </div>
+  </form>
+  <h1 class="bigspace">
+    Results
+    <input
+      type="button"
+      class="smallspace"
+      value="Run model"
+      onclick="makeOutput(doTheMaths(getAllNumbers(getSectionIds(),getWebbings())));"
+    />
+  </h1>
+  <div class="smallspace" id="clicktorun">
+    Click the button to run the model with the setup and parameters you have
+    entered above.
+  </div>
+  <div class="smallspace" style="height: 300px; width: 100%" id="graphs"></div>
+  <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+  <div class="smallspace" id="tableResult"></div>
+  <div class="smallspace" id="textResult"></div>
+</body>
