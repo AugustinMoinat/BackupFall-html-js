@@ -8,7 +8,7 @@ At this stage however, it has <b>not been validated</b> by real experiments.
 
 ### How it works
 
-layout.html file contains the general structure of the page. By opening this file you can run the simulation.
+layout.html file contains the general structure of the page. By <a href="https://augustinmoinat.github.io/BackupFall-html-js/layout.html">opening this file</a> you can run the simulation.
 
 script-add-webbing.js handles the definition of the webbing types to be used.
 
