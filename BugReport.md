@@ -12,8 +12,12 @@ bug1 - SOLVED:
 
     Solution: Make x-adjustments as the line goes down, not only in the fine tuning part of the iteration.
 
-bug 2:
+bug 2 - SOLVED:
     Setup: Polyester heavy;110;Polyester light;130
     everything else works
 
     Compute standing tension returns 0, until we pull 7m of webbing.
+
+    Analysis: After going down too far, the interpolation jumps too fast too far: all the way to the section where none of the lines are under tension.
+
+    Solution: in the case where FY==FdY in the iteration, turning around to go back to the correct area.

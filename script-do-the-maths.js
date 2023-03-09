@@ -1,5 +1,12 @@
+var debug=false;
+function log(s){
+  if(debug){
+    console.log(s)
+  }
+}
 var backupgetstight = false;
 function doTheMaths(numbers) {
+  log("standing tension");
   var standingT = standingTension(numbers);
   // numbers get adjusted in this function
   var r = orderFreeSection(
@@ -7,6 +14,7 @@ function doTheMaths(numbers) {
     numbers.connections,
     numbers.breaks
   );
+  log("stretch curves");
   var stretchCurves = getTotalStretch(
     r.freeSections,
     r.totalLength,
@@ -14,6 +22,7 @@ function doTheMaths(numbers) {
     numbers.slacker.p
   );
   backupgetstight = false;
+  log("balance point");
   var balancepoint = solveStaticPos(
     stretchCurves.leftStretchCurve,
     stretchCurves.rightStretchCurve,
@@ -56,7 +65,7 @@ function doTheMaths(numbers) {
     ) / 1000;
   var backuptightbounce = backupgetstight;
   backupgetstight = false;
-  
+  log("fall point");
   var fallpoint = fall(
     balancepoint[1] + numbers.slacker.b + numbers.slacker.h / 2,
     numbers.slacker.l,
@@ -96,8 +105,8 @@ function doTheMaths(numbers) {
     ) / 1000;
   var backuptightfall = backupgetstight;
   backupgetstight = false;
-  console.log("start");
-  console.log(stretchCurves);
+  log("backup fall");
+  log(stretchCurves);
   var backupFallpoint = fall(
     balancepoint[1] + numbers.slacker.b + numbers.slacker.h / 2,
     numbers.slacker.l,
@@ -110,7 +119,7 @@ function doTheMaths(numbers) {
     numbers.setupWeight,
     balancepoint[1]
   );
-  console.log("end");
+  log("finish");
   var F1max =
     getF1(
       backupFallpoint[2],
@@ -873,10 +882,10 @@ function iterateY(x, y, dy, L, h1, h2, stretchCurve1, stretchCurve2, p) {
   }
   var FY = forceY(x, y, L, h1, h2, stretchCurve1, stretchCurve2, p);
   var FdY = forceY(x, y + dy, L, h1, h2, stretchCurve1, stretchCurve2, p);
-  console.log(y,FY);
+  log({y,FY});
   if (FY == FdY) {
-    console.log("iteration y maybe wrong");
-    return y + dy / 2;
+    console.log("iteration y maybe wrong, turning around");
+    return y - dy;
   }
   return ((y + dy) * FY - y * FdY) / (FY - FdY);
 }
@@ -919,22 +928,24 @@ function solveStaticPos(stretchCurve1, stretchCurve2, L, h1, h2, m) {
   while (FY > 0) {
     y += dy;
     FY = forceY(x, y, L, h1, h2, stretchCurve1, stretchCurve2, p);
-    console.log(y,FY);
+    log(y,FY);
     var x1 = iterateX(x, dx, y, L, h1, h2, stretchCurve1, stretchCurve2);
     dx = Math.max(Math.min(x1 - x, L / 50), -L / 50); // avoid too big steps from computational error
     x += dx;
   }
   dy = dy / 10;
   // Iterate while the step remains above some threshold
-  while (Math.abs(dx) + Math.abs(dy) > L / 50000) {
+  while (Math.abs(dx) + Math.abs(dy) > L / 100000) {
     // One step in y
     var y1 = iterateY(x, y, dy, L, h1, h2, stretchCurve1, stretchCurve2, p);
     dy = Math.max(Math.min(y1 - y, L / 10), -L / 10); // avoid too big steps from computational error
     y += dy;
+    dy/=2;
     // One step in x
     x1 = iterateX(x, dx, y, L, h1, h2, stretchCurve1, stretchCurve2);
     dx = Math.max(Math.min(x1 - x, L / 50), -L / 50); // avoid too big steps from computational error
     x += dx;
+    dx/=2;
   }
   return [x, y];
 }
