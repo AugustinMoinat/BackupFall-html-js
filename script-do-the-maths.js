@@ -56,6 +56,7 @@ function doTheMaths(numbers) {
     ) / 1000;
   var backuptightbounce = backupgetstight;
   backupgetstight = false;
+  
   var fallpoint = fall(
     balancepoint[1] + numbers.slacker.b + numbers.slacker.h / 2,
     numbers.slacker.l,
@@ -95,6 +96,8 @@ function doTheMaths(numbers) {
     ) / 1000;
   var backuptightfall = backupgetstight;
   backupgetstight = false;
+  console.log("start");
+  console.log(stretchCurves);
   var backupFallpoint = fall(
     balancepoint[1] + numbers.slacker.b + numbers.slacker.h / 2,
     numbers.slacker.l,
@@ -107,6 +110,7 @@ function doTheMaths(numbers) {
     numbers.setupWeight,
     balancepoint[1]
   );
+  console.log("end");
   var F1max =
     getF1(
       backupFallpoint[2],
@@ -860,17 +864,6 @@ function forceY(x, y, L, h1, h2, stretchCurve1, stretchCurve2, p) {
   // Calculates the sum of the forces in the y direction
   return p - getFleash(x, y, L, h1, h2, stretchCurve1, stretchCurve2);
 }
-function goDownToFar(x, y, dy, L, h1, h2, stretchCurve1, stretchCurve2, p) {
-  if (dy == 0) {
-    return y;
-  }
-  var FY = forceY(x, y, L, h1, h2, stretchCurve1, stretchCurve2, p);
-  while (FY > 0) {
-    y += dy;
-    FY = forceY(x, y, L, h1, h2, stretchCurve1, stretchCurve2, p);
-  }
-  return y;
-}
 function iterateY(x, y, dy, L, h1, h2, stretchCurve1, stretchCurve2, p) {
   // One step of iteration by interpolating between (x,y) and (x,y+dy)
   // to find the point where the forces balance
@@ -880,6 +873,7 @@ function iterateY(x, y, dy, L, h1, h2, stretchCurve1, stretchCurve2, p) {
   }
   var FY = forceY(x, y, L, h1, h2, stretchCurve1, stretchCurve2, p);
   var FdY = forceY(x, y + dy, L, h1, h2, stretchCurve1, stretchCurve2, p);
+  console.log(y,FY);
   if (FY == FdY) {
     console.log("iteration y maybe wrong");
     return y + dy / 2;
@@ -921,10 +915,15 @@ function solveStaticPos(stretchCurve1, stretchCurve2, L, h1, h2, m) {
   var x = findFirstX(l01, l02, L);
   var y = findFirstY(l01, l02, L, h1, h2, x);
   // First approximation to get into the area where interpolation works
-  var x1 = iterateX(x, dx, y, L, h1, h2, stretchCurve1, stretchCurve2);
-  dx = Math.max(Math.min(x1 - x, L / 50), -L / 50); // avoid too big steps from computational error
-  x += dx;
-  y = goDownToFar(x, y, dy, L, h1, h2, stretchCurve1, stretchCurve2, p);
+  var FY = forceY(x, y, L, h1, h2, stretchCurve1, stretchCurve2, p);
+  while (FY > 0) {
+    y += dy;
+    FY = forceY(x, y, L, h1, h2, stretchCurve1, stretchCurve2, p);
+    console.log(y,FY);
+    var x1 = iterateX(x, dx, y, L, h1, h2, stretchCurve1, stretchCurve2);
+    dx = Math.max(Math.min(x1 - x, L / 50), -L / 50); // avoid too big steps from computational error
+    x += dx;
+  }
   dy = dy / 10;
   // Iterate while the step remains above some threshold
   while (Math.abs(dx) + Math.abs(dy) > L / 50000) {

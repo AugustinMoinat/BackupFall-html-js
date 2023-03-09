@@ -378,7 +378,6 @@ function addImages(images, values) {
 function positionImage(imageLabel, x, y, up) {
   var imageBottom = chart.axisY[0].convertValueToPixel(y).toFixed(0);
   var imageCenter = chart.axisX[0].convertValueToPixel(x).toFixed(0);
-  console.log(imageBottom);
   imageLabel.width("35px");
   imageLabel.height("50px");
   imageLabel.css({
@@ -390,7 +389,6 @@ function positionImage(imageLabel, x, y, up) {
   chart.render();
 }
 window.onresize = function () {
-  console.log("boum");
   for (var i = 0; i < imagedata.length; i++) {
     positionImage(
       imagedata[i].img,
