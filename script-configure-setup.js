@@ -124,7 +124,6 @@ function addSection() {
         <input
           type="button"
           class="danger inline-block right"
-          class="btn btn-sm btn-outline-danger" 
           onclick="deleteSection(${secId})"
           value="Delete"
         >

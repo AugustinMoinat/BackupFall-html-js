@@ -1,12 +1,7 @@
-var debug=false;
-function log(s){
-  if(debug){
-    console.log(s)
-  }
-}
 var backupgetstight = false;
 function doTheMaths(numbers) {
-  log("standing tension");
+  console.log({ num: numbers, text: "hihi" });
+  console.log("standing tension");
   var standingT = standingTension(numbers);
   // numbers get adjusted in this function
   var r = orderFreeSection(
@@ -14,7 +9,7 @@ function doTheMaths(numbers) {
     numbers.connections,
     numbers.breaks
   );
-  log("stretch curves");
+  console.log("stretch curves");
   var stretchCurves = getTotalStretch(
     r.freeSections,
     r.totalLength,
@@ -22,15 +17,16 @@ function doTheMaths(numbers) {
     numbers.slacker.p
   );
   backupgetstight = false;
-  log("balance point");
+  console.log("balance point");
   var balancepoint = solveStaticPos(
-    stretchCurves.leftStretchCurve,
-    stretchCurves.rightStretchCurve,
-    numbers.spot.L,
-    numbers.spot.h1,
-    numbers.spot.h2,
+    numbers.spot,
+    {
+      left: stretchCurves.leftStretchCurve,
+      right: stretchCurves.rightStretchCurve,
+    },
     numbers.setupWeight + numbers.slacker.w
   );
+  console.log(balancepoint);
   var F1balance =
     getF1(
       balancepoint[0],
@@ -65,19 +61,20 @@ function doTheMaths(numbers) {
     ) / 1000;
   var backuptightbounce = backupgetstight;
   backupgetstight = false;
-  log("fall point");
+  console.log("fall point");
   var fallpoint = fall(
     balancepoint[1] + numbers.slacker.b + numbers.slacker.h / 2,
+    numbers.spot,
+    {
+      left: stretchCurves.leftStretchCurve,
+      right: stretchCurves.rightStretchCurve,
+    },
     numbers.slacker.l,
-    stretchCurves.leftStretchCurve,
-    stretchCurves.rightStretchCurve,
-    numbers.spot.L,
-    numbers.spot.h1,
-    numbers.spot.h2,
     numbers.slacker.w,
     numbers.setupWeight,
     balancepoint[1]
   );
+  console.log(fallpoint);
   var F1fall =
     getF1(
       fallpoint[2],
@@ -94,32 +91,28 @@ function doTheMaths(numbers) {
       stretchCurves.rightStretchCurve
     ) / 1000;
   var FleashFall =
-    getFleash(
-      fallpoint[2],
-      fallpoint[3],
-      numbers.spot.L,
-      numbers.spot.h1,
-      numbers.spot.h2,
-      stretchCurves.leftStretchCurve,
-      stretchCurves.rightStretchCurve
-    ) / 1000;
+    getFleash(fallpoint[2], fallpoint[3], numbers.spot, {
+      left: stretchCurves.leftStretchCurve,
+      right: stretchCurves.rightStretchCurve,
+    }) / 1000;
   var backuptightfall = backupgetstight;
   backupgetstight = false;
-  log("backup fall");
-  log(stretchCurves);
+  console.log("backup fall");
+  console.log(stretchCurves);
   var backupFallpoint = fall(
     balancepoint[1] + numbers.slacker.b + numbers.slacker.h / 2,
+    numbers.spot,
+    {
+      left: stretchCurves.leftFallStretchCurve,
+      right: stretchCurves.rightFallStretchCurve,
+    },
     numbers.slacker.l,
-    stretchCurves.leftFallStretchCurve,
-    stretchCurves.rightFallStretchCurve,
-    numbers.spot.L,
-    numbers.spot.h1,
-    numbers.spot.h2,
     numbers.slacker.w,
     numbers.setupWeight,
     balancepoint[1]
   );
-  log("finish");
+  console.log(backupFallpoint);
+  console.log("finish");
   var F1max =
     getF1(
       backupFallpoint[2],
@@ -151,15 +144,10 @@ function doTheMaths(numbers) {
       stretchCurves.rightFallStretchCurve
     ) / 1000;
   var FleashMax =
-    getFleash(
-      backupFallpoint[2],
-      backupFallpoint[3],
-      numbers.spot.L,
-      numbers.spot.h1,
-      numbers.spot.h2,
-      stretchCurves.leftFallStretchCurve,
-      stretchCurves.rightFallStretchCurve
-    ) / 1000;
+    getFleash(backupFallpoint[2], backupFallpoint[3], numbers.spot, {
+      left: stretchCurves.leftFallStretchCurve,
+      right: stretchCurves.rightFallStretchCurve,
+    }) / 1000;
   var backuptightbackup = backupgetstight;
   backupgetstight = false;
   return {
@@ -329,11 +317,11 @@ function standingTension(numbers) {
     numbers.spot.L / 2
   );
   var balancepoint = solveStaticPos(
-    stretchCurves.leftStretchCurve,
-    stretchCurves.rightStretchCurve,
-    numbers.spot.L,
-    numbers.spot.h1,
-    numbers.spot.h2,
+    numbers.spot,
+    {
+      left: stretchCurves.leftStretchCurve,
+      right: stretchCurves.rightStretchCurve,
+    },
     numbers.setupWeight
   );
   var F1 = getF1(
@@ -369,6 +357,9 @@ function getAllNumbers(ids, webs) {
   if (sp > L || sp < 0) {
     alert("Slackliner is not on the line.");
     return;
+  }
+  if (sp<L/8 || sp>7*L/8){
+    alert("Slackliner is close to the anchors. The model assumes the rings don't slide so the result will not be accurate");
   }
   var slacker = { w: sw, h: sh, l: sl, p: sp, b: sb };
   var sections = [];
@@ -821,18 +812,21 @@ function findFirstX(l01, l02, L) {
   // Finds the lengthwise point of balance of the line with no weight
   return (L * l01) / (l01 + l02);
 }
-function findFirstY(l01, l02, L, h1, h2, x0) {
+function findFirstY(l01, l02, spot, x0) {
   // Finds the point to which the line sags before it starts to stretch.
-  // if the line is aleardy stretched, returns the proportinal point
-  if (l01 + l02 < Math.sqrt(Math.pow(L, 2) + Math.pow(h1 - h2, 2))) {
-    return (h1 * l01 + h2 * l02) / (l01 + l02);
+  // if the line is aleardy stretched, returns the proportional point
+  if (
+    l01 + l02 <
+    Math.sqrt(Math.pow(spot.L, 2) + Math.pow(spot.h1 - spot.h2, 2))
+  ) {
+    return (spot.h1 * l01 + spot.h2 * l02) / (l01 + l02);
   } else {
     return (
       0.5 *
-      (h1 +
-        h2 -
+      (spot.h1 +
+        spot.h2 -
         Math.sqrt(Math.pow(l01, 2) - Math.pow(x0, 2)) -
-        Math.sqrt(Math.pow(l02, 2) - Math.pow(L - x0, 2)))
+        Math.sqrt(Math.pow(l02, 2) - Math.pow(spot.L - x0, 2)))
     );
   }
 }
@@ -852,293 +846,319 @@ function getF2(x, y, L, h2, stretchCurve) {
   // calculates the tension in the line on the first side
   return forceFromLength(getl2(x, y, L, h2), stretchCurve);
 }
-function getFleash(x, y, L, h1, h2, stretchCurve1, stretchCurve2) {
+function getFleash(x, y, spot, stretchCurves) {
   // Find the vertical force created by the line
-  var F1 = getF1(x, y, h1, stretchCurve1);
-  var F2 = getF2(x, y, L, h2, stretchCurve2);
-  var l1 = getl1(x, y, h1);
-  var l2 = getl2(x, y, L, h2);
-  return ((h1 - y) * F1) / l1 + ((h2 - y) * F2) / l2;
+  var F1 = getF1(x, y, spot.h1, stretchCurves.left);
+  var F2 = getF2(x, y, spot.L, spot.h2, stretchCurves.right);
+  var l1 = getl1(x, y, spot.h1);
+  var l2 = getl2(x, y, spot.L, spot.h2);
+  return ((spot.h1 - y) * F1) / l1 + ((spot.h2 - y) * F2) / l2;
 }
-function forceX(x, y, L, h1, h2, stretchCurve1, stretchCurve2) {
+function forceX(x, y, spot, stretchCurves) {
   // Calculates the sum of the forces in the x direction
-  var l1 = getl1(x, y, h1);
-  var l2 = getl2(x, y, L, h2);
+  var l1 = getl1(x, y, spot.h1);
+  var l2 = getl2(x, y, spot.L, spot.h2);
   return (
-    (-x * getF1(x, y, h1, stretchCurve1)) / l1 +
-    ((L - x) * getF2(x, y, L, h2, stretchCurve2)) / l2
+    (-x * getF1(x, y, spot.h1, stretchCurves.left)) / l1 +
+    ((spot.L - x) * getF2(x, y, spot.L, spot.h2, stretchCurves.right)) / l2
   );
 }
-function forceY(x, y, L, h1, h2, stretchCurve1, stretchCurve2, p) {
+function forceY(x, y, spot, stretchCurves, p) {
   // Calculates the sum of the forces in the y direction
-  return p - getFleash(x, y, L, h1, h2, stretchCurve1, stretchCurve2);
+  return p - getFleash(x, y, spot, stretchCurves);
 }
-function iterateY(x, y, dy, L, h1, h2, stretchCurve1, stretchCurve2, p) {
+function iterateY(x, y, dy, spot, stretchCurves, p) {
   // One step of iteration by interpolating between (x,y) and (x,y+dy)
   // to find the point where the forces balance
   // avoid some computational errors along the way
   if (dy == 0) {
     return y;
   }
-  var FY = forceY(x, y, L, h1, h2, stretchCurve1, stretchCurve2, p);
-  var FdY = forceY(x, y + dy, L, h1, h2, stretchCurve1, stretchCurve2, p);
-  log({y,FY});
+  var FY = forceY(x, y, spot, stretchCurves, p);
+  var FdY = forceY(x, y + dy, spot, stretchCurves, p);
   if (FY == FdY) {
     console.log("iteration y maybe wrong, turning around");
     return y - dy;
   }
   return ((y + dy) * FY - y * FdY) / (FY - FdY);
 }
-function iterateX(x, dx, y, L, h1, h2, stretchCurve1, stretchCurve2) {
+function iterateX(x, dx, y, spot, stretchCurves) {
   // One step of iteration by interpolating between (x,y) and (x+dx,y)
   // to find the point where the forces balance
   // avoid some computational errors along the way
   if (dx == 0) {
     return x;
   }
-  var FX = forceX(x, y, L, h1, h2, stretchCurve1, stretchCurve2);
-  var FdX = forceX(x + dx, y, L, h1, h2, stretchCurve1, stretchCurve2);
+  var FX = forceX(x, y, spot, stretchCurves);
+  var FdX = forceX(x + dx, y, spot, stretchCurves);
   if (FX == FdX) {
     console.log("iteration x maybe wrong");
     return x + dx / 2;
   }
   return ((x + dx) * FX - x * FdX) / (FX - FdX);
 }
-function solveStaticPos(stretchCurve1, stretchCurve2, L, h1, h2, m) {
+function solveStaticPos(spot, stretchCurves, m) {
   // Finds the static balance position with an iterative approach
   // @Inputs:
-  // stretchCurve1, stretchCurve2: piecewise linear stretch curves
+  // stretchCurves:{left, right} piecewise linear stretch curves
   // of the webbing on each side
-  // L, h1, h2: Length of the gap and height of each anchor
+  // spot{L, h1, h2}: Length of the gap and height of each anchor
   // m: mass of the body
   // @Outputs:
   // x, y: the final position
   //
   var p = 9.81 * m;
   // Find the first step lenght
-  var dx = L / 100;
-  var dy = -L / 100;
+  var dx = spot.L / 100;
+  var dy = -spot.L / 100;
   // Find the starting position for the iteration
-  var l01 = stretchCurve1.l[0];
-  var l02 = stretchCurve2.l[0];
-  var x = findFirstX(l01, l02, L);
-  var y = findFirstY(l01, l02, L, h1, h2, x);
+  var l01 = stretchCurves.left.l[0];
+  var l02 = stretchCurves.right.l[0];
+  var x = findFirstX(l01, l02, spot.L);
+  var y = findFirstY(l01, l02, spot, x);
   // First approximation to get into the area where interpolation works
-  var FY = forceY(x, y, L, h1, h2, stretchCurve1, stretchCurve2, p);
+  var FY = forceY(x, y, spot, stretchCurves, p);
   while (FY > 0) {
     y += dy;
-    FY = forceY(x, y, L, h1, h2, stretchCurve1, stretchCurve2, p);
-    log(y,FY);
-    var x1 = iterateX(x, dx, y, L, h1, h2, stretchCurve1, stretchCurve2);
-    dx = Math.max(Math.min(x1 - x, L / 50), -L / 50); // avoid too big steps from computational error
+    FY = forceY(x, y, spot, stretchCurves, p);
+    var x1 = iterateX(x, dx, y, spot, stretchCurves);
+    dx = Math.max(Math.min(x1 - x, spot.L / 50), -spot.L / 50); // avoid too big steps from computational error
     x += dx;
   }
   dy = dy / 10;
   // Iterate while the step remains above some threshold
-  while (Math.abs(dx) + Math.abs(dy) > L / 100000) {
+  while (Math.abs(dx) + Math.abs(dy) > spot.L / 100000) {
     // One step in y
-    var y1 = iterateY(x, y, dy, L, h1, h2, stretchCurve1, stretchCurve2, p);
-    dy = Math.max(Math.min(y1 - y, L / 10), -L / 10); // avoid too big steps from computational error
+    var y1 = iterateY(x, y, dy, spot, stretchCurves, p);
+    dy = Math.max(Math.min(y1 - y, spot.L / 10), -spot.L / 10); // avoid too big steps from computational error
     y += dy;
-    dy/=2;
+    dy /= 2;
     // One step in x
-    x1 = iterateX(x, dx, y, L, h1, h2, stretchCurve1, stretchCurve2);
-    dx = Math.max(Math.min(x1 - x, L / 50), -L / 50); // avoid too big steps from computational error
+    x1 = iterateX(x, dx, y, spot, stretchCurves);
+    dx = Math.max(Math.min(x1 - x, spot.L / 50), -spot.L / 50); // avoid too big steps from computational error
     x += dx;
-    dx/=2;
+    dx /= 2;
   }
   return [x, y];
 }
-function interateEnergyY(
+function iterateEnergyY(
   x,
-  y,
-  yy,
-  dy,
-  h1,
-  h2,
-  L,
-  stretchCurve1,
-  stretchCurve2,
+  ymin,
+  ymax,
+  y0,
+  spot,
+  stretchCurves,
+  leash,
   mSlacker,
   mLine,
   yLine,
   E0
 ) {
-  // One step of iteration in y direction by interpolating between (x,y) and (x,y+dy)
-  // to find the point where the energy balances with E0.
-  // avoid some computational errors along the way
+  // find the point where the energy balances with E0 by dichotomy
+  // We hope that point is between ymin and ymax, but we still check.
+  var dy = (ymax - ymin) / 2;
   if (dy == 0) {
-    return y;
+    return { ymax: ymax, ymin: ymin };
   }
-  var Ey = getEtotal(
+  var Emax = getEtotal(
     x,
-    y,
-    yy,
-    h1,
-    h2,
-    L,
-    stretchCurve1,
-    stretchCurve2,
+    ymax,
+    y0,
+    yLine,
+    spot,
+    stretchCurves,
+    leash,
     mSlacker,
-    mLine,
-    yLine
+    mLine
   );
-  var Edy = getEtotal(
+  var Emin = getEtotal(
     x,
-    y,
-    yy + dy,
-    h1,
-    h2,
-    L,
-    stretchCurve1,
-    stretchCurve2,
+    ymin,
+    y0,
+    yLine,
+    spot,
+    stretchCurves,
+    leash,
     mSlacker,
-    mLine,
-    yLine
+    mLine
   );
-  if (Ey == Edy) {
-    console.log("Energy iteration maybe wrong");
-    return y + dy / 2;
+  // Check the interval is correct
+  while (Emin < E0) {
+    ymax = ymin;
+    Emax = Emin;
+    ymin -= dy;
+    Emin = getEtotal(
+      x,
+      ymin,
+      y0,
+      yLine,
+      spot,
+      stretchCurves,
+      leash,
+      mSlacker,
+      mLine
+    );
   }
-  return (E0 * dy - (yy + dy) * Ey + yy * Edy) / (Edy - Ey);
+  if (Emax > E0) {
+    ymin = ymax;
+    Emin = Emax;
+    ymax += dy;
+    Emax = getEtotal(
+      x,
+      ymax,
+      y0,
+      yLine,
+      spot,
+      stretchCurves,
+      leash,
+      mSlacker,
+      mLine
+    );
+  }
+  // Do the dichotomy
+  var ymed = (ymax + ymin) / 2;
+  var Emed = getEtotal(
+    x,
+    ymed,
+    y0,
+    yLine,
+    spot,
+    stretchCurves,
+    leash,
+    mSlacker,
+    mLine
+  );
+  if (Emed > E0) {
+    console.log(Emax, E0, Emed);
+    return { ymin: ymed, ymax: ymax };
+  }
+  console.log(Emed, E0, Emin);
+  return { ymin: ymin, ymax: ymed };
 }
-function fall(
-  y,
-  leash,
-  stretchCurve1,
-  stretchCurve2,
-  L,
-  h1,
-  h2,
-  mSlacker,
-  mLine,
-  yLine
-) {
+function fall(y0, spot, stretchCurves, leash, mSlacker, mLine, yLine) {
   // Computes the fall using conservation of energy
   // @Inputs:
-  // y: original height of body (m) (initial speed is 0)
-  // leash: leash length (m)
-  // stretchCurve1, stretchCurve2: piecewise linear stretch curves
+  // y0: original height of body (m) (initial speed is 0)
+  // spot{L, h1, h2} (m): width of the gap and height of each anchor
+  // stretchCurve{left, right}: piecewise linear stretch curves
   // of the webbing on each side
-  // L, h1, h2 (m): width of the gap and height of each anchor
+  // leash: leash length (m)
   // mSlacker: mass of the body (in kg)
   // mLine: mass of the webbing (in kg)
   // yLine: original height of the line (m)
-  // @Output: [xf,yf,yb]
+  // @Output: [xf,yf,xb,yb]
   // xf, yf: final position of the leashring
-  // yb: height at the bottom of the bounce
+  // xb,yb: position at the bottom of the bounce
   //
   // find out the final position after the fall has settled
-  var l01 = stretchCurve1.l[0];
-  var l02 = stretchCurve2.l[0];
-  var x0 = findFirstX(l01, l02, L);
-  var y0 = findFirstY(l01, l02, L, h1, h2, x0);
-  var [xf, yf] = solveStaticPos(
-    stretchCurve1,
-    stretchCurve2,
-    L,
-    h1,
-    h2,
-    mSlacker + mLine
-  );
+  var [xf, yf] = solveStaticPos(spot, stretchCurves, mSlacker + mLine);
   // find out if the initial position has some tension in the line
-  var E0 = 0;
-  if (y0 > y + leash) {
-    // the slackliner is pulling the line down from its balance position
-    E0 = getEline(xf, y + leash, h1, h2, L, stretchCurve1, stretchCurve2);
-  } else {
-    if (l01 + l02 < Math.sqrt(Math.pow(L, 2) + Math.pow(h1 - h2, 2))) {
-      // the line has some stored enegy, even with no one on.
-      E0 = getEline(x0, y0, h1, h2, L, stretchCurve1, stretchCurve2);
-    }
-  }
+  var E0 = getEline(xf, yLine, spot, stretchCurves);
+
+  console.log("E0:", E0);
   // runs from balance position down to find the point where become negative
-  var yy = yf;
-  var dy = -L / 100;
-  var Ey = getEtotal(
+  var ymax = yf;
+  var dy = Math.max(- spot.L / 100, -leash);
+  var ymin = yf + dy;
+  var Eymin = getEtotal(
     xf,
-    y + leash,
-    yy,
-    h1,
-    h2,
-    L,
-    stretchCurve1,
-    stretchCurve2,
+    ymin,
+    y0,
+    yLine,
+    spot,
+    stretchCurves,
+    leash,
     mSlacker,
-    mLine,
-    yLine
+    mLine
   );
-  while (Ey < E0) {
-    yy += dy;
-    Ey = getEtotal(
+  var Eymax = getEtotal(
+    xf,
+    ymax,
+    y0,
+    yLine,
+    spot,
+    stretchCurves,
+    leash,
+    mSlacker,
+    mLine
+  );
+  while (Eymin < E0) {
+    ymax = ymin;
+    Eymax = Eymin;
+    ymin += dy;
+    Eymin = getEtotal(
       xf,
-      y + leash,
-      yy,
-      h1,
-      h2,
-      L,
-      stretchCurve1,
-      stretchCurve2,
+      ymin,
+      y0,
+      yLine,
+      spot,
+      stretchCurves,
+      leash,
       mSlacker,
-      mLine,
-      yLine
+      mLine
     );
   }
   // use interpolation to find the result more precisely
-  var xx = xf
-  var dx = L/100;
-  while (Math.abs(dx) +Math.abs(dy) > L / 50000) {
+  var xx = xf;
+  var dx = spot.L / 100;
+  while (Math.abs(dx) + Math.abs(dy) > spot.L / 50000) {
     // vertical direction with the energy
-    yy1 = interateEnergyY(
+    var res = iterateEnergyY(
       xx,
-      y + leash,
-      yy,
-      dy,
-      h1,
-      h2,
-      L,
-      stretchCurve1,
-      stretchCurve2,
+      ymin,
+      ymax,
+      y0,
+      spot,
+      stretchCurves,
+      leash,
       mSlacker,
       mLine,
       yLine,
       E0
     );
-    dy = Math.max(Math.min(yy1 - yy, L / 10), -L / 10);
-    yy += dy;
+    console.log(res);
+    ymin = res.ymin;
+    ymax = res.ymax;
+    dy = ymax - ymin;
     // horizontal direction with the force
-    xx1 = iterateX(xx, dx, yy, L, h1, h2, stretchCurve1, stretchCurve2);
-    dx = Math.max(Math.min(xx1 - xx, L / 50), -L / 50); // avoid too big steps from computational error
+    var xx1 = iterateX(xx, dx, (ymax + ymin) / 2, spot, stretchCurves);
+    dx = Math.max(Math.min(xx1 - xx, spot.L / 50), -spot.L / 50); // avoid too big steps from computational error
     xx += dx;
+    dx /= 2;
   }
-  return [xf, yf, xx, yy];
+  return [xf, yf, xx, (ymax + ymin) / 2];
 }
-function getEline(x, y, h1, h2, L, stretchCurve1, stretchCurve2) {
+function getEline(x, y, spot, stretchCurves) {
   // Finds the elastic energy stored in the webbing
-  var l1 = getl1(x, y, h1);
-  var l2 = getl2(x, y, L, h2);
+  var l1 = getl1(x, y, spot.h1);
+  var l2 = getl2(x, y, spot.L, spot.h2);
   return (
-    potentialEnergyFromLength(l1, stretchCurve1) +
-    potentialEnergyFromLength(l2, stretchCurve2)
+    potentialEnergyFromLength(l1, stretchCurves.left) +
+    potentialEnergyFromLength(l2, stretchCurves.right)
   );
 }
 function getEtotal(
   x,
-  y0,
   y,
-  h1,
-  h2,
-  L,
-  stretchCurve1,
-  stretchCurve2,
-  m,
-  mLine,
-  yLine
+  y0,
+  y0Line,
+  spot,
+  stretchCurves,
+  leash,
+  mSlacker,
+  mLine
 ) {
   // Find the total energy from the line
   // plus the potential energy with the fall from the original height
-  var Eline = getEline(x, y, h1, h2, L, stretchCurve1, stretchCurve2);
-  var Epot = m * 9.81 * (y - y0);
-  var Epotline = (mLine * 9.81 * (y - yLine)) / 2;
+  // x,y: current position of the ring
+  // y0: original height of the slacker
+  // y0Line: original height of the line
+  // spot:{L,h1,h2} length of the gap and height of anchors
+  // stretchCurves{left, right}: stretchcurves of the webbing
+  // leash: leash length
+  // mSlacker, mLine: weight of the slacker and weight of the webbing
+  var Eline = getEline(x, y, spot, stretchCurves);
+  var Epot = mSlacker * 9.81 * (y - y0 - leash);
+  var Epotline = mLine * 9.81 * (y - y0Line);
   return Eline + Epot + Epotline;
 }
