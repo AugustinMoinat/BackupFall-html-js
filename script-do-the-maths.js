@@ -1,6 +1,6 @@
 var backupgetstight = false;
 function doTheMaths(numbers) {
-  console.log({ num: numbers, text: "hihi" });
+  console.log("input data: ", numbers);
   console.log("standing tension");
   var standingT = standingTension(numbers);
   // numbers get adjusted in this function
@@ -98,7 +98,6 @@ function doTheMaths(numbers) {
   var backuptightfall = backupgetstight;
   backupgetstight = false;
   console.log("backup fall");
-  console.log(stretchCurves);
   var backupFallpoint = fall(
     balancepoint[1] + numbers.slacker.b + numbers.slacker.h / 2,
     numbers.spot,
@@ -506,6 +505,9 @@ function getTotalStretch(freeSections, totalLength, spotLength, slackerPos) {
   //      spotLength:number,
   //      slackerPos:number
   // output:
+  //     leftStretchCurve, rightStretchCurve, leftFallStretchCurve, rightFallStretchCurve:
+  // each is one list of lengths and one list of corresponding tensions,
+  // that are used to interpolate a piecewise linear function.
   var length = 0;
   const webbingRatio = totalLength / spotLength;
   const slackerPosOnWeb = slackerPos * webbingRatio;
@@ -527,31 +529,28 @@ function getTotalStretch(freeSections, totalLength, spotLength, slackerPos) {
     const slackerPosOnSection = slackerPosOnWeb - length;
     const slackerPosOnBAckupSection =
       (slackerPosOnSection * freeSections[i].blength) / freeSections[i].length;
-
     const sections = freeSections[i].section;
     const breaks = freeSections[i].break;
-
-    r = sectionStretchWithSlacker(
+    var r2 = sectionStretchWithSlacker(
       sections,
       breaks,
       slackerPosOnSection,
       slackerPosOnBAckupSection
     );
-    leftStretchCurve.push(r.leftStretchCurve);
-    leftFallStretchCurve.push(r.leftFallStretchCurve);
+    leftStretchCurve.push(r2.leftStretchCurve);
+    leftFallStretchCurve.push(r2.leftFallStretchCurve);
 
-    rightStretchCurve.push(r.rightStretchCurve);
-    rightFallStretchCurve.push(r.rightFallStretchCurve);
+    rightStretchCurve.push(r2.rightStretchCurve);
+    rightFallStretchCurve.push(r2.rightFallStretchCurve);
     i++;
   }
   // treat all the sections after the slackliner
   while (i < freeSections.length) {
-    var r = sectionStretch(freeSections[i].section, freeSections[i].break);
-    rightStretchCurve.push(r.StretchCurve);
-    rightFallStretchCurve.push(r.FallStretchCurve);
+    var r3 = sectionStretch(freeSections[i].section, freeSections[i].break);
+    rightStretchCurve.push(r3.StretchCurve);
+    rightFallStretchCurve.push(r3.FallStretchCurve);
     i++;
   }
-
   return {
     leftStretchCurve: agglomerateStretch(leftStretchCurve),
     rightStretchCurve: agglomerateStretch(rightStretchCurve),
@@ -701,7 +700,7 @@ function agglomerateStretch(stretchCurve) {
   // the list of lengths and corresponding tensions.
   // l and t are strictly increasing, and same size.
   // output: the stretch curve obtain by putting all systems in series.
-  curve = stretchCurve[0];
+  var curve = stretchCurve[0];
   for (let i = 1; i < stretchCurve.length; i++) {
     curve = combineStretch(curve, stretchCurve[i]);
   }
@@ -1029,10 +1028,10 @@ function iterateEnergyY(
     mLine
   );
   if (Emed > E0) {
-    console.log(Emax, E0, Emed);
+    console.log("Emin:", Emed, " Emax:", Emax);
     return { ymin: ymed, ymax: ymax };
   }
-  console.log(Emed, E0, Emin);
+  console.log("Emin:", Emin, " Emax:", Emed);
   return { ymin: ymin, ymax: ymed };
 }
 function fall(y0, spot, stretchCurves, leash, mSlacker, mLine, yLine) {
@@ -1116,7 +1115,6 @@ function fall(y0, spot, stretchCurves, leash, mSlacker, mLine, yLine) {
       yLine,
       E0
     );
-    console.log(res);
     ymin = res.ymin;
     ymax = res.ymax;
     dy = ymax - ymin;
