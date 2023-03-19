@@ -164,17 +164,11 @@ function showWebs() {
 function defaultWebbings() {
   // HTML - specify a list of default webbings in memory and HTML
   var stringWebs = "";
-  stringWebs += "{n:Nylon tube,w:50,s:9,t:5}";
+  stringWebs += "{n:Nylon,w:50,s:9,t:5}";
   stringWebs += ";";
-  stringWebs += "{n:Nylon flat,w:55,s:7.5,t:5}";
+  stringWebs += "{n:Polyester,w:50,s:4,t:5}";
   stringWebs += ";";
-  stringWebs += "{n:Polyester light,w:50,s:4,t:5}";
-  stringWebs += ";";
-  stringWebs += "{n:Polyester heavy,w:70,s:1.7,t:5}";
-  stringWebs += ";";
-  stringWebs += "{n:HMPE light,w:28,s:1,t:5}";
-  stringWebs += ";";
-  stringWebs += "{n:HMPE heavy,w:45,s:0.3,t:5}";
+  stringWebs += "{n:High tech,w:28,s:1,t:5}";
   makeWebs(stringWebs);
   showWebs();
 }

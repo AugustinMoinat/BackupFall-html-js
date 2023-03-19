@@ -99,7 +99,12 @@
   <p class="center"><b>Welcome to the simulation</b></p>
   <h2 class="bigspace">Webbings specification</h2>
   <p class="space">
-    For each webbing, specify the weight in grams per meter (important for long
+    Here is where you can enter the specifications of each webbing in your setup.
+    You can find those characteristics on the manufacturer's website, or on the 
+    <a href="https://www.slackdb.com/gear">slackline database</a>.
+  </p>
+  <p class="space">
+    For each webbing type, specify the weight in grams per meter (important for long
     set-ups), the stretch in percentage, and the force in kN at which this
     stretch is measured. You can also change the name of the webbings at your
     convenience. A set of default webbings loads automatically, but you can
@@ -210,7 +215,8 @@
     </p>
     <p class="smallspace">
       <b>Do not worry</b> about the exact total length of your setup for now,
-      you can adjust the tension later.
+      you can adjust the tension later. This is the setup as you put it in your 
+      bags, before rigging it.
     </p>
 
     <div id="secs"></div>
@@ -230,6 +236,17 @@
   </form>
 
   <h2 class="space">Spot specification</h2>
+  <p class="smallspace">
+    Now you specify the caracteristics of the spot where the line will be rigged.
+    We need the distance between the two anchors, and their height. Since not all 
+    lines are level, you can choose the height of both anchors. The sections above will
+    be rigged left to right across the spot. Tension happens just below.
+  </p>
+  <p class="smallspace">
+    If you want to see the results in terms of sag, enter 0 as the heigth of the anchors.
+    If you want are worried about an obstacle below the line, enter the height 
+    of the anchors relative to this obstacle.
+  </p>
   <form id="inputSpot">
     <div class="center smallspace">
       <label for="L"> Gap length (m) :</label>
@@ -238,15 +255,15 @@
     <div class="center smallspace">
       <div class="inline-block center minispace">
         <label for="h1"> height left side (m) :</label>
-        <input type="number" step="1" id="h1" min="0" value="50" />
+        <input type="number" step="1" id="h1" min="0" value="0" />
       </div>
       <div class="inline-block center minispace">
         <label for="h2"> height right side (m) :</label>
-        <input type="number" step="1" id="h2" min="0" value="50" />
+        <input type="number" step="1" id="h2" min="0" value="0" />
       </div>
     </div>
   </form>
-
+  <div class="center space"> <img src=".\assets\spot.png"></div>
   <h2 class="space">
     Rig your line
     <input
@@ -256,6 +273,42 @@
       onclick="standingTension(getAllNumbers(getSectionIds(),getWebbings()))"
     />
   </h2>
+  <p class="smallspace">
+    You can adjust the tension of your line in two ways: automatic tensioning by 
+    specifying a tension, or by manually pulling some  length of webbing from one
+    side or the other.
+  </p>
+  <h3 class="minispace"> Automatic tensioning </h3>
+  <p class="smallspace">
+    Simply specify the desired tension and choose from which side you pull
+    to automatically get to that tension.
+  </p>
+  <form id="inputAutoRigging">
+    <div class="center space">
+      <label for="AutoTinput">Desired tension (kN):</label>
+      <input
+        type="number"
+        step="0.1"
+        id="AutoTinput"
+        min="0.1"
+        value="2"
+        #AutoTinput
+      />
+    </div>
+    <div class="center">
+      <input
+        type="button"
+        value="Adjust from left side"
+        onclick="AutoPullLeft(getSectionIds(),getWebbings());"
+      />
+      <input
+        type="button"
+        value="Adjust from right side"
+        onclick="AutoPullRight(getSectionIds(),getWebbings());"
+      /> 
+    </div>
+  </form>
+  <h3 class="minispace"> Manual tensioning </h3>
   <p class="smallspace">
     Adjust the tension of your line as you would in a real spot: by pulling in
     some of the webbing on either side. Use decimals to tune exactly your
@@ -268,13 +321,11 @@
         <div class="inline-block" class="btn-group center">
           <input
             type="button"
-            class="btn btn-sm btn-outline-primary"
             value="Pull"
             onclick="pullLeft(leftIncrement.value, getSectionIds(),getWebbings());"
           />
           <input
             type="button"
-            class="btn btn-sm btn-outline-primary"
             value="Release"
             onclick="releaseLeft(leftIncrement.value, getSectionIds(),getWebbings());"
           />
@@ -295,13 +346,11 @@
         <div class="inline-block" class="btn-group center">
           <input
             type="button"
-            class="btn btn-sm btn-outline-primary"
             value="Pull"
             onclick="pullRight(rightIncrement.value, getSectionIds(),getWebbings());"
           />
           <input
             type="button"
-            class="btn btn-sm btn-outline-primary"
             value="Release"
             onclick="releaseRight(rightIncrement.value, getSectionIds(),getWebbings());"
           />
@@ -321,45 +370,49 @@
     </div>
   </form>
   <p class="smallspace info" id="emptySetupParagraph"></p>
-
-  <h2 class="bigspace">Slackliner</h2>
-  <p class="smallspace">
-    Describe the slackliner, their position on the line, and the height of their
-    bounce.
-  </p>
-  <form id="inputSlacker">
-    <div class="smallspace center">
-      <div class="inline-block center minispace">
-        <label for="w"> Weight (kg) :</label>
-        <input type="number" step="1" id="w" value="75" min="1" />
+  
+  
+  <div class="inline-block">
+    <h2 class="bigspace">Slackliner</h2>
+    <p class="smallspace">
+      Describe the slackliner, their position on the line, and the amplitude of their
+      bounce.
+    </p>
+    <form id="inputSlacker">
+      <div class="smallspace center">
+        <div class="inline-block center minispace">
+          <label for="w"> Weight (kg) :</label>
+          <input type="number" step="1" id="w" value="75" min="1" />
+        </div>
+        <div class="inline-block center minispace">
+          <label for="h"> Height (m) :</label>
+          <input type="number" step="0.1" id="h" value="1.8" min="0.1" />
+        </div>
+        <div class="inline-block center minispace">
+          <label for="ll"> Leash length (m) :</label>
+          <input type="number" step="0.1" id="ll" value="1.2" min="0" />
+        </div>
       </div>
-      <div class="inline-block center minispace">
-        <label for="h"> Height (m) :</label>
-        <input type="number" step="0.1" id="h" value="1.8" min="0.1" />
+      <div class="smallspace center">
+        <div class="inline-block center minispace">
+          <label for="pos"> Distance from left anchor (m) :</label>
+          <input
+            type="number"
+            step="1"
+            id="pos"
+            value="50"
+            min="0"
+            max="L.value"
+          />
+        </div>
+        <div class="inline-block center minispace">
+          <label for="b"> Bounce amplitude (m) :</label>
+          <input type="number" step="0.5" id="b" value="0" />
+        </div>
       </div>
-      <div class="inline-block center minispace">
-        <label for="ll"> Leash length (m) :</label>
-        <input type="number" step="0.1" id="ll" value="1.2" min="0" />
-      </div>
-    </div>
-    <div class="smallspace center">
-      <div class="inline-block center minispace">
-        <label for="pos"> Distance from left anchor (m) :</label>
-        <input
-          type="number"
-          step="1"
-          id="pos"
-          value="50"
-          min="0"
-          max="L.value"
-        />
-      </div>
-      <div class="inline-block center minispace">
-        <label for="b"> Bounce amplitude (m) :</label>
-        <input type="number" step="0.5" id="b" value="0" />
-      </div>
-    </div>
-  </form>
+    </form>
+  </div>
+  <div class="inline-block"><img src=".\assets\slackliner.png" class="space"></div>
   <h1 class="bigspace">
     Results
     <input

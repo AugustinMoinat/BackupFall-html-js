@@ -3,6 +3,7 @@ function doTheMaths(numbers) {
   console.log("input data: ", numbers);
   console.log("standing tension");
   var standingT = standingTension(numbers);
+  showStandingTension(standingT);
   // numbers get adjusted in this function
   var r = orderFreeSection(
     numbers.sections,
@@ -206,7 +207,7 @@ function pullLeft(distance, ids, webs) {
   }
   leftPull += parseFloat(distance);
   numbers = getAllNumbers(ids, webs);
-  standingTension(numbers);
+  showStandingTension(standingTension(numbers));
   writeParagraphTension();
 }
 function releaseLeft(distance, ids, webs) {
@@ -220,7 +221,7 @@ function releaseLeft(distance, ids, webs) {
     leftPull = 0;
   }
   numbers = getAllNumbers(ids, webs);
-  standingTension(numbers);
+  showStandingTension(standingTension(numbers));
   writeParagraphTension();
 }
 function pullRight(distance, ids, webs) {
@@ -230,7 +231,7 @@ function pullRight(distance, ids, webs) {
   }
   rightPull += parseFloat(distance);
   numbers = getAllNumbers(ids, webs);
-  standingTension(numbers);
+  showStandingTension(standingTension(numbers));
   writeParagraphTension();
 }
 function releaseRight(distance, ids, webs) {
@@ -244,9 +245,64 @@ function releaseRight(distance, ids, webs) {
     rightPull = 0;
   }
   numbers = getAllNumbers(ids, webs);
-  standingTension(numbers);
+  showStandingTension(standingTension(numbers));
   writeParagraphTension();
 }
+function AutoPullLeft(ids, webs) {
+  leftPull = 0;
+  var tension = parseFloat(document.getElementById("AutoTinput").value);
+  numbers= getAllNumbers(ids, webs);
+  var currentTension = standingTension(numbers);
+  if (tension<currentTension) {
+    alert("The specified tension is too low for this setup and spot");
+    return;
+  }
+  dpull=numbers.spot.L/200;
+  while(currentTension<tension){
+    leftPull+=dpull;
+    currentTension = standingTension(getAllNumbers(ids, webs));
+  }
+  dpull/=2;
+  for(let i=0;i<6;i++){   
+    if(currentTension<tension){
+      leftPull += dpull
+    } else {
+      leftPull -= dpull
+    }
+    dpull /= 2;
+    currentTension = standingTension(getAllNumbers(ids, webs));
+  }
+  showStandingTension(currentTension);
+  writeParagraphTension();
+}
+function AutoPullRight(ids, webs) {
+  rightPull = 0;
+  var tension = parseFloat(document.getElementById("AutoTinput").value);
+  numbers= getAllNumbers(ids, webs);
+  var currentTension = standingTension(numbers);
+  if (tension<currentTension) {
+    alert("The specified tension is too low for this setup and spot");
+    return;
+  }
+  dpull=numbers.spot.L/200;
+  while(currentTension<tension){
+    rightPull+=dpull;
+    currentTension = standingTension(getAllNumbers(ids, webs));
+  }
+  dpull/=2;
+  for(let i=0;i<6;i++){   
+    if(currentTension<tension){
+      rightPull += dpull
+    } else {
+      rightPull -= dpull
+    }
+    dpull /= 2;
+    currentTension = standingTension(getAllNumbers(ids, webs));
+  }
+  showStandingTension(currentTension);
+  writeParagraphTension();
+}
+
 function adjustNumbersLeft(distance, numbers) {
   // find up to which section to remove
   var i = 0; // number of sections to remove
@@ -289,7 +345,7 @@ function adjustNumbersRight(distance, numbers) {
 
   // Calculate change in weight
   numbers.setupWeight -= fraction * numbers.sections[i - 1].weight;
-  // Remove connections and breaks if any section if fully out
+  // Remove connections and breaks if any section if fulpullly out
   numbers.sections.splice(i);
   numbers.connections.splice(i);
   numbers.breaks.splice(i);
@@ -298,7 +354,7 @@ function adjustNumbersRight(distance, numbers) {
 function resetTension(numbers) {
   leftPull = 0;
   rightPull = 0;
-  standingTension(numbers);
+  showStandingTension(standingTension(numbers));
   document.getElementById("emptySetupParagraph").innerHTML = "";
 }
 function standingTension(numbers) {
@@ -337,10 +393,13 @@ function standingTension(numbers) {
     stretchCurves.rightStretchCurve
   );
   var standingT = Math.max(F1, F2) / 1000;
+  return standingT;
+}
+function showStandingTension(standingT){
   document.getElementById(
     "T"
   ).innerHTML = `Standing tension: ${standingT.toFixed(2)} kN`;
-  return standingT;
+  document.getElementById("AutoTinput").value=standingT.toFixed(2);
 }
 function getAllNumbers(ids, webs) {
   // Reconstruct the necessary data from the form
@@ -892,7 +951,7 @@ function iterateX(x, dx, y, spot, stretchCurves) {
   var FdX = forceX(x + dx, y, spot, stretchCurves);
   if (FX == FdX) {
     console.log("iteration x maybe wrong");
-    return x + dx / 2;
+    return x - dx / 2;
   }
   return ((x + dx) * FX - x * FdX) / (FX - FdX);
 }
