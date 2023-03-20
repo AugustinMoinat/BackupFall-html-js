@@ -31,8 +31,20 @@ I want to do real world tests to validate the model, or to know how much it is w
 I will also eventually make a publication on how the model works, for the nerds out there.
 
 There are a few functionnalities I'm already thinking about:
-- Automatic tensioning of the line up to a desired tension (difficulty 2/10)
 - Implementing real stretch curves for webbing instead of linear (model difficulty 1/10; UI difficulty: 8/10)
+- Implementing real dynamics (stretch curves depend on stretch speed) - MASSIVE CHANGE, WOULD NEED A COMPLETELY NEW METHOD.
+
+### Bug reports
+
+If you find that the app returns results that seem weird to you, please tell me so I can have a look!
+
+To reproduce the bug, I will need to know which webbings you are using, and what your setup is. Here's how to tell me exactly what I need to know:
+- Save your webbings to browser memory
+- Save your setup to browser memory
+- In Devtools, go to Application/LocalStorage to see the values (Tuto: <a href="https://developer.chrome.com/docs/devtools/storage/localstorage/">Chrome</a>,<a href="https://learn.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/storage/localstorage">Edge</a>, <a href="https://firefox-source-docs.mozilla.org/devtools-user/storage_inspector/local_storage_session_storage/index.html">Firefox</a>). Make sure to be in the right tab after checking the tuto.
+- Webbings are under the key "myWebbings". Copy-paste that string.
+- The set-up is under the key "mySetup<i>name_of_setup</i>". Copy paste also that string.
+- Add all additional information: sections of mainline that fail, spot, tension (method, and left and right webbing pulled), highliner's characteristics.
 
 ### Contact
 
