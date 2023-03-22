@@ -1,0 +1,678 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Backup-fall simulator</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-opaquegray { background-color: rgba(255, 255, 255, 0.0375); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="286b0f10-3f67-4277-9e78-60048e1a82d1" class="page sans"><header><h1 class="page-title">Backup-fall simulator</h1></header><div class="page-body"><p id="f40acf0d-6dd2-4ac3-9cf8-5d41834633f8" class="">My name is Augustin, I’ve been highlining for almost 10 years. I’m a gear nerd, and I know some programming.</p><p id="32f83c39-e1a7-4719-ab94-2105979684ca" class="">In the past weeks, I developped a highline backup-fall simulator that I made available as a <a href="https://augustinmoinat.github.io/BackupFall-html-js/layout.html">beta version</a>.  I’m writing this for highliners that are curious to understand the physical and mathematical ideas behind it. If you do not know what a highline is, it might be a good idea to first check out the ressources on the <a href="https://www.slacklineinternational.org/">ISA website</a> , in particular <a href="https://data.slacklineinternational.org/safety/gear-standards/isa_21_2019_highline_system.pdf/">this document</a>, that explains in technical terms what a highline is.</p><p id="6762454e-c0b9-4f76-ae4d-2a69f3ebd166" class="">To my knowledge, it is the first backup fall simulator that takes into account the complexity of modern highline rigging. In the last year, I don’t remember a single highline I’ve been on where the main and backup webbing were not connected in some way.</p><h2 id="9f17d460-98f2-46b3-a122-8b227bb12a6e" class="">Give back to Ceasar…</h2><div id="8883c332-888f-4109-8bd9-199420a3a539" class="column-list"><div id="d7511003-abd6-4bc5-95d1-ac97de774e16" style="width:50%" class="column"><p id="ff334d98-12d1-4c0f-9bca-1ed16030ff2e" class="">A widely known backup fall simulator is the one developped by Panos Athanasiadis available on his <a href="http://slackbro.pythonanywhere.com/backup/">website</a> . It takes all the necessary parameters to compute the forces in a backup fall, with a slackliner starting in the middle of the line. </p></div><div id="9cb78170-e96d-423c-b5c4-c1cfa7cd8acc" style="width:50%" class="column"><figure id="b9241e31-4fcc-46de-a880-d58c5922b031" class="image"><a href="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/Untitled.png"><img style="width:800px" src="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/Untitled.png"/></a></figure></div></div><p id="76db20ab-2ed7-4f01-8ffa-a89c250a78b9" class="">I have used the interface to his model to verify that my model gives similar results in the relevant cases: the highliner is in the middle, and there is no connection between mainline and backup webbing. Since I have less than 1% difference in all the cases I tried, I believe we used the exact same physical model, and that only a few differences in the computational scheme used to solve the equations created the little differences we had. If you’re versed in programming, you can check the <a href="https://github.com/AugustinMoinat/BackupFall-html-js/blob/main/Tests/CompareWithSlackBro.ipynb">full report</a> of this comparison. </p><figure id="9565209b-15f9-44f8-8478-e2c14f37d8e3" class="image"><a href="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/Untitled%201.png"><img style="width:822px" src="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/Untitled%201.png"/></a></figure><p id="4ff97a72-6226-43b5-a97d-edd31c42dae9" class="">I will explain this physical model and the computational scheme, I hope in a way that’s understandable to anyone with a knowledge of highschool science, and with motivation.</p><h1 id="3db2104b-885d-4840-9324-6e932b2ffc31" class="">Newton’s first law</h1><div id="a76d8afc-24b9-459c-bcc7-a83be2d5ffe9" class="column-list"><div id="f66b8d56-a666-47fb-ad40-cb12853dcc08" style="width:50%" class="column"><p id="9a0af12e-b926-4219-ae3d-81f068d6b947" class="">Newton’s first law of motion states that an object doesn’t move if all the forces applied to it balance, i.e. their sum is 0. When a slackliner is on the line, the forces that are applied to them are the weight, coming from the earth’s attraction, and the force that the webbing applies through the feet of the slackliner, that keeps them in the air. This force results from the tension in the webbing, which can in turn be derived from the elongation of the webbing. That’s why we have <a href="https://www.slacklineverband.com/know-how/slackline-vergleich-dehnung/">stretch charts</a>.</p></div><div id="ea6563f1-d5b2-4254-9b91-f628639d6e68" style="width:50%" class="column"><figure id="befcb740-ccc8-48c8-a305-f71d67bc6d69" class="image"><a href="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/Untitled%202.png"><img style="width:1033px" src="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/Untitled%202.png"/></a></figure></div></div><div id="3cfbc2fb-62d6-4206-8ea4-0bcf06520ed7" class="column-list"><div id="df12d4f4-a50b-4368-86de-d3f4370dfaf7" style="width:50%" class="column"><p id="ee93f777-3af3-45e1-b2e4-40f35eac48b1" class="">Actually, we simplify this by assuming the stretch is directly proportional to the elongation. This is mostly to make it possible for the user to enter the stretch easily through the interface. It would be nice to be able to enter a full stretch curve, and that might be implemented in a future version of the app. For now, the stretch curves we consider will look like this:</p></div><div id="8fb8b0ba-9d2f-4a04-815a-79b3ce324a2b" style="width:50%" class="column"><figure id="9686f57d-10f6-4c40-9bd5-f5889ffcfa75" class="image"><a href="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/Untitled%203.png"><img style="width:562px" src="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/Untitled%203.png"/></a></figure></div></div><p id="bfab1d5b-9226-4f95-ba4b-7f0d80235158" class="">Note that we have switched the axis: this makes more sense as we will want to know what the tension is for a given stretch. It will also make more sense when we will run energy computations later.</p><p id="2d82a9eb-8754-4fd0-8a29-8f1ad2ec0194" class="">Now we can know how much tension is in a piece of webbing by knowing its characteristics and measuring its length. Let’s look at the sum of forces again. The weight is vertical, constant. The tension along each piece of webbing gives a force proportional to the extension, directed along the webbing. We represent these forces graphically by vectors (arrows) that point in the direction of the force, and whose length is proportional to the intensity of the force.</p><figure id="93398499-d7a6-4993-ad98-8543b097bdc0" class="image"><a href="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/Untitled%204.png"><img style="width:940px" src="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/Untitled%204.png"/></a></figure><p id="0cf1d360-0241-41b2-a24b-be2741cebe69" class=""><strong>In the simulation</strong>, you can decide how far along the webbing the slackliner is, essentially attaching the slackliner to a point on the line. This creates two independent pieces of webbing, one on the left, and one on the right, and when we give some coordinates to the program, it can compute the stretch of each piece of webbing, and the forces resulting. </p><p id="3a48398d-6942-43f7-8aa1-5a20e9cadf9c" class="">Each vector force gets split into an horizontal and a vertical component. For the weight, there is no horizontal component. For the tension of the webbings, we project along the horizontal and vertical axis. This way we get the sum of force in the horizontal direction and the sum of forces in the vertical direction.</p><figure id="0780c844-8194-4634-afb7-af488d470ffa" class="image"><a href="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/Untitled%205.png"><img style="width:904px" src="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/Untitled%205.png"/></a></figure><p id="b9520066-50fb-40d6-9267-8ea879ec30c1" class="">So, we have this piece of program that you feed a position, and that returns the force in the horizontal direction, and the force in the vertical direction. How do we use that to find the point where the forces balance?</p><h1 id="ce3c90ff-2ad5-4f89-9f3a-2ec87be71a96" class="">Newton’s method</h1><p id="67256572-42d7-4589-b129-f87b58a4bdb0" class="">Newton was not only a great physicist, he also had great mathematical ideas. Our goal is to find a point where the sum of the forces cancels out. Newton’s idea was to improve our guessing game by looking at the variations of the function we are studying. The idea is in essence really simple. Imagine you know two values values of a function, and you want to guess where the zero value of that function is.</p><p id="3ca7e395-caba-474e-bf96-d6572442d473" class="">
+</p><figure id="9bff4c02-b7d0-4d12-afb7-cd983ee1a92f" class="image"><a href="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/newton1.png"><img style="width:800px" src="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/newton1.png"/></a></figure><p id="8c69428b-71de-48cc-b1da-8aa4bc3e4eeb" class="">You might guess that the point you’re looking for is on the line between these two points, like this:</p><p id="d189a191-a76a-4a17-9cc6-132d4a26c46d" class="">
+</p><figure id="5e7d7745-0108-4719-9a0e-c63ab712bd3d" class="image"><a href="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/newton2.png"><img style="width:800px" src="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/newton2.png"/></a></figure><p id="e42f709f-d9c3-4f6f-ba3a-899828680d8c" class="">But then, you can run the program again, and it tells you that the actual value of the function at that point was higher:</p><p id="8d263ae0-5a01-4910-b60c-9e7f4a5d88a2" class="">
+</p><figure id="6f8d1f47-ac0b-40d8-a560-bfb2a5dc147b" class="image"><a href="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/newton3.png"><img style="width:800px" src="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/newton3.png"/></a></figure><p id="7bc6fe27-4fd7-4c5b-a460-6cb1c780d929" class="">Well, you just apply the same principle again:</p><p id="889d7cc1-780c-4633-becc-e3bb08da6bf4" class="">
+</p><figure id="81299cb8-c58a-49c9-9bb7-93d83c0a6572" class="image"><a href="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/newton4.png"><img style="width:800px" src="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/newton4.png"/></a></figure><p id="15ff9fbe-2afb-4084-9d5c-2e6375c8666f" class="">If the actual function you were trying to find the zero off looks like this below, you can understand that this approach is going to get really close to the value you want fast.</p><p id="69ae9ec8-156e-4671-8868-0c462ba08649" class="">
+</p><figure id="a037d68b-eba5-4574-b578-e0396ff87688" class="image"><a href="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/newton5.png"><img style="width:800px" src="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/newton5.png"/></a></figure><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="39d85d40-24c5-471a-b0b7-212b1bd6a39f"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%">Remember, you don’t actually know this curve, it’s only on this last graph to help understand the process. It would take too much time to compute the value for each point.</div></figure><p id="b143857f-531a-4166-9582-47960e1c27a2" class="">Here, we started with one point where the value was positive, and one point where the value was negative. The beauty of this process is that it works even when the values are both positive (or both negative). You just do the same thing, but expand the line outside of the two points to see where it crosses the zero line.</p><p id="8ca3c84e-82ee-41dd-9856-08fbb2cb51c2" class="">
+</p><figure id="c8b722d0-ae7e-4652-8d93-50c6a90923fc" class="image"><a href="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/full_newton.png"><img style="width:1600px" src="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/full_newton.png"/></a></figure><p id="7f175264-82f7-4c99-bf7c-ec6005f3c3e8" class="">So now we have all the ingredients to find out the sag that the line has with the slackliner on it. We just need to find a good pair of starting points. Here’s the structure of the algorithm:</p><h3 id="47b84e45-5510-4b1a-a5de-76e13c008eef" class="">Algorithm to find the static position of the slackliner:</h3><ul id="2a0387e4-5954-436d-a901-aab790088964" class="bulleted-list"><li style="list-style-type:disc"><strong>Starting points</strong>: Position of the line with no weight on it, and the same one meter lower;</li></ul><ul id="ccc7b2e8-3812-4c9f-b9f7-277828a589a2" class="bulleted-list"><li style="list-style-type:disc">Do one iteration of <strong>Newton’s method in the vertical direction;</strong></li></ul><ul id="08d8be13-1a83-4bd3-b140-c99422c1c9de" class="bulleted-list"><li style="list-style-type:disc">Do one iteration of <strong>Newton’s method in the horizontal direction;</strong></li></ul><ul id="8a7179e7-f729-42fd-b29b-7509bc9f7eb6" class="bulleted-list"><li style="list-style-type:disc"><strong>Repeat</strong> as long as the changes in each iteration are more than 1cm;</li></ul><ul id="37b67275-1540-4127-99c5-0ee151a6ce59" class="bulleted-list"><li style="list-style-type:disc">From the final position, <strong>compute the tension</strong> in each piece of webbing.</li></ul><h1 id="81247a16-b96d-4367-a93e-758e7a2bc447" class="">But wait, what happened to having a split set-up?</h1><p id="b84b18a6-a132-4047-a58f-f3faa0586814" class="">So far, we have not done much different from the SlackBro model. There is one problem with split setups, that every freestyler is familiar with: tight backup! Indeed, if one section of backup gets tight, the stretch behaviour of the line changes.</p><p id="62cc9db7-76c1-4146-a675-ac0e1ae3a391" class="">For example, take a mainline webbing that is 50m long, and the back-up of the corresponding section is 53m. What happens is that for the first 3 meters of stretch, you only feel the force of the main line, but after that you also feel the tension from the back up webbing. The two forces add up. Graphically, it looks like this:</p><figure id="83e7b1fe-110d-445f-8b81-0c3e3a597dfd" class="image"><a href="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/Untitled%206.png"><img style="width:562px" src="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/Untitled%206.png"/></a></figure><p id="198d94ac-7c43-42be-a005-6d08ce335c9d" class="">Now, how do we connect two segments end to end? Let’s take another segment, with slightly different characteristics. You can read from the graph below that for this second segment, the mainline is 45m, and the backup is 47m. </p><figure id="5f27583e-ae75-428d-a78e-adc14e35f8f2" class="image"><a href="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/Untitled%207.png"><img style="width:562px" src="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/Untitled%207.png"/></a></figure><p id="0990f304-94f2-423c-8266-ef15119b37e8" class="">Imagine you put the two setups end to end. They start with a length of (50+45) meters, and stretch out as the tension increases. When the tension reaches around 3kN, the backup of the second section gets under tension. We read what the length of the first section is at that tension, and we know the length of the full setup at 3kN. When it reaches 5kN, the backup of the first section also gets under tension. We read the length of the second section at that tension, and we know the length of the full setup at 5kN.</p><p id="5a343c11-0a75-4d20-aa18-3ce5106b0388" class="">
+</p><figure id="3867cdc4-baf3-4197-8aef-60695aea63c4" class="image"><a href="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/compose_setups.png"><img style="width:1650px" src="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/compose_setups.png"/></a></figure><p id="c0dee878-591e-46fb-abf7-21ac3c795c35" class="">We repeat this for every section of the setup, and get the curves on which we can read what the tension is for any given length. Plug this into the algorithm above, and you can compute the static position of the slackliner.</p><p id="9187b0ff-767d-446e-a32c-0aeafacf1b93" class="">If we want to compute a backup fall where one segment fails, we will simply need to compute again the stretch curve of the whole system, but we will ignore the mainline for that particular section. The calculations from the next section are the same, whether we are considering a leashfall or a backup fall, only the stretch curve changes.</p><h1 id="f82aafb1-5a62-481f-a292-3f11691705cd" class="">Let’s do a fall!</h1><p id="9d371e52-f762-4821-aea4-942818c69bb7" class="">Sir Isaac Newton is famous for falls, and yet the principle we are going to use for this computation is not named after him. </p><p id="3d0f1257-c325-456d-9c2f-574666529dea" class="">What we are using is the <strong>conservation of energy. </strong>This principle states that in any physical system, there is no energy appearing or disapearing out of nowhere. In this highline modelisation, there are 3 different kinds of energy we will consider:</p><ul id="c6c04a79-1b74-43a3-97f4-0e6491879352" class="bulleted-list"><li style="list-style-type:disc"><strong>Kinetic energy</strong>, which is the energy associated with moving objects;</li></ul><ul id="a611cae1-a938-4b55-987f-b1f10f3781c0" class="bulleted-list"><li style="list-style-type:disc"><strong>Elastic potential energy</strong>, which is the energy stored in a spring, or in our case, in webbing;</li></ul><ul id="c41b59a8-1ae4-44c7-ae25-75f60578901c" class="bulleted-list"><li style="list-style-type:disc"><strong>Gravitational potential energy</strong>, which is the energy related to the height of an object.</li></ul><p id="f1b566f4-0afd-44aa-bf0e-d663b708ba29" class="">In an actual highline, there are more kinds of energy. For example, there is chemical energy, stored in your cells, that can be used to make your legs push on that webbing. This creates bounce, which is a cycle of transfer between the three energies above. </p><ul id="c3ea2b75-ea12-4d90-99d6-2e5cbf93488a" class="bulleted-list"><li style="list-style-type:disc">At the top of the bounce, you have no speed and the webbing is the least stretched, but you are at the maximum of the gravitational potential energy.</li></ul><ul id="32d219c3-3964-4e2a-a229-0e560def73fd" class="bulleted-list"><li style="list-style-type:disc">As you go down you pick up speed, kinetic energy increases and gravitational energy decreases, but the webbing is starting to store some energy.</li></ul><ul id="3d503f60-40d1-446a-8cd7-81970b7477d0" class="bulleted-list"><li style="list-style-type:disc">At the bottom of the bounce, all the kinetic energy is gone, gravitational potential energy is at a minimum, it’s all stored inside the webbing, ready to lift you up again.</li></ul><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="fa2c54b8-dd05-4e49-a073-c7fdec2c6d8c"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%">Bounces don’t last forever unfortunately, that’s because some of that energy gets dissipated, mostly in friction with the air. That’s why you need to keep pushing it.</div></figure><p id="fe5eaf0e-33d0-4596-9ae7-f578cc95b07d" class="">What interests us for the algorithm is the lowest point of the fall: this way you can know if you will hit the ground. It is also the point where the webbing is the most stretched, and sees the highest tension. The other point we know is the starting point, with the slackliner standing on the line. The good thing is that we don’t have to deal with kinetic energy: in both those positions, the speed is zero.</p><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="65c70325-6833-41c2-8f3c-33729843704b"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%">This is actually a worst case assumption! In most falls, there will be a swinging movement, which means that not all of the kinetic energy is gone. But it’s best to assume the worst.</div></figure><h2 id="fd596526-06a2-4d77-9287-6ddea4971c6f" class="">The area under the curve…</h2><p id="89f4d729-37dc-4116-9764-9c807c28459c" class="">If you’re trying to push a car along a road, the energy you’re putting into that work is equivalent to the force necessary to push it, mutliplied by the distance before the driver who forgot his lights on manages to start the engine. Actually, pushing the car might be harder at the start, easier towards the end. In the end, the energy transferred to the car is proportional to the area in grey on the graph below.</p><figure id="dfd14a41-00d3-43e6-bb9d-ecd3d6e62c86" class="image"><a href="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/areaunder.png"><img style="width:800px" src="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/areaunder.png"/></a></figure><p id="13a72edd-5985-43fc-b2f7-712d35dfaac6" class="">Let’s apply this to the two kinds of energy we are computing.</p><h3 id="9b3788ed-130e-4ce2-b260-5a1f1f1a9897" class="">Gravitational potential energy</h3><p id="e1c735f0-6401-4480-af29-683ce12621e4" class="">Unless you are bouncing into outer space like those BounceKult monkeys, the gravitational force on your body is constant (9.81x weight). This means that the curve is flat. The area under the curve is simply the travel distance (difference of height) multiplied by the gravitational force.</p><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="ec571685-4112-474f-be30-e2e72014753b"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%">I can choose whatever point as a reference point to compute the energy. What is important is the variation of energy. So for example, in the program, the gravitational potential energy is zero at the point from which the slackliner falls.</div></figure><p id="8a6a6015-27cd-423d-b5d5-58204ba05a1e" class="">
+</p><p id="96203e96-6bc6-4597-8cb6-1cbb6ca9cdcd" class="">The program also takes into account the weight of the webbing. So the webbing has its own gravitational potential energy.</p><p id="664b4243-e8c0-4ded-be2d-7914e26975a7" class="">
+</p><figure id="ec60a6db-9c0c-44c2-9bae-b349e4f50aef" class="image"><a href="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/fall.png"><img style="width:1920px" src="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/fall.png"/></a></figure><h3 id="30d049d0-b4de-4d14-945e-d60c9fae7cd7" class="">Elastic potential energy</h3><div id="31fa090f-15a0-4166-aae5-868936f1aeb7" class="column-list"><div id="bd627fbd-8a3a-4152-b02b-5e3cd6999d06" style="width:50%" class="column"><p id="8bdeadc1-95e2-428d-b4c5-f40e651188e5" class="">In the stretch curve that we got before, the horizontal axis is the change in length, the vertical axis is the corresponding force. Therefore, the energy stored inside the webbing stretched to a given distance is exactly the area under that curve.</p></div><div id="8af6bd30-8176-4288-9da8-fe57009b5db7" style="width:50%" class="column"><figure id="4f0943fb-817a-4d6f-ba9e-e1dfa5b74e56" class="image"><a href="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/energy.png"><img style="width:600px" src="Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1/energy.png"/></a></figure></div></div><p id="64d2ee32-08c4-4cdc-b95c-d850c37ed64d" class="">For any position of the highliner hanging in the leash, it is now possible to compute their gravitational potential energy as well as the elastic potential energy stored inside the setup. We put this into a part of the program, that we can reuse anytime we need it.</p><p id="dca9330e-c373-4baf-9dd6-564dcbe26b12" class="">Now we have all the ingredients to tell the computer how to find the lowest point of the fall. We just need to find the lower point where the sum of the energies is the same as the original sum of energies. Newton’s method can be used in the same way as before, the only difference being that instead of trying to find the point where the sum of the forces is 0, we try to find the point where the sum of the energies is equal to the original energy.</p><h3 id="1663a72a-660f-482d-b8f6-f8ab1b40a078" class="">Algorithm to compute a leash/backup fall:</h3><ul id="e4d5ca8d-7b43-4d25-b2eb-7098e3f654ea" class="bulleted-list"><li style="list-style-type:disc"><strong>Compute the initial energy</strong>: elastic energy stored inside the webbing plus gravitational potential energy;</li></ul><ul id="6d7e9ab8-3b76-4a21-89c6-4696ddd7482e" class="bulleted-list"><li style="list-style-type:disc"><strong>Starting points</strong>: result of the algorithm to compute the static position, dropping into the leash;</li></ul><ul id="60a338c5-fe0d-4a19-a45d-d2487f53f537" class="bulleted-list"><li style="list-style-type:disc">Do one iteration of <strong>Newton’s method with the energy in the vertical direction;</strong></li></ul><ul id="934b3b23-682b-43e3-8cf8-743511b0d15c" class="bulleted-list"><li style="list-style-type:disc">Do one iteration of <strong>Newton’s method with the force in the horizontal direction;</strong></li></ul><ul id="fd4d9702-265e-4668-b73f-9754ba386a59" class="bulleted-list"><li style="list-style-type:disc"><strong>Repeat</strong> until the energy is close to the initial energy;</li></ul><ul id="d668098a-56e1-4779-9c37-c5309620a23e" class="bulleted-list"><li style="list-style-type:disc">From the final position, <strong>compute the tension</strong> in each piece of webbing, and the resulting tension in the leash.</li></ul><p id="a81ced4e-2c05-49b3-9ea2-0c8829f60c1f" class="">The same algorithm is used whether we want to compute a leashfall or a backup fall. The only difference being the stretch curves that are given as an input.</p><h1 id="75214202-c259-4856-a76a-456296bff906" class="">Outro</h1><p id="dbf46237-a9b3-442b-87aa-c9cdf07ad8bf" class="">The algorithm as presented here was pretty clear in my head from the start. Coding it went surprisingly well. The moment I showed the final product to my housemate, he tried it and his setup crashed the program.</p><p id="71bb8d93-8760-424c-9ea3-4024fe6b6c04" class="">Some debugging later, I was happy to present it to a wider audience. Anyone can now use it, but it will truly have value once it is compared to real life tests.</p></div></article></body></html>

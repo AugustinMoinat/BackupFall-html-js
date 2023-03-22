@@ -251,23 +251,23 @@ function releaseRight(distance, ids, webs) {
 function AutoPullLeft(ids, webs) {
   leftPull = 0;
   var tension = parseFloat(document.getElementById("AutoTinput").value);
-  numbers= getAllNumbers(ids, webs);
+  numbers = getAllNumbers(ids, webs);
   var currentTension = standingTension(numbers);
-  if (tension<currentTension) {
+  if (tension < currentTension) {
     alert("The specified tension is too low for this setup and spot");
     return;
   }
-  dpull=numbers.spot.L/200;
-  while(currentTension<tension){
-    leftPull+=dpull;
+  dpull = numbers.spot.L / 200;
+  while (currentTension < tension) {
+    leftPull += dpull;
     currentTension = standingTension(getAllNumbers(ids, webs));
   }
-  dpull/=2;
-  for(let i=0;i<6;i++){   
-    if(currentTension<tension){
-      leftPull += dpull
+  dpull /= 2;
+  for (let i = 0; i < 6; i++) {
+    if (currentTension < tension) {
+      leftPull += dpull;
     } else {
-      leftPull -= dpull
+      leftPull -= dpull;
     }
     dpull /= 2;
     currentTension = standingTension(getAllNumbers(ids, webs));
@@ -278,23 +278,23 @@ function AutoPullLeft(ids, webs) {
 function AutoPullRight(ids, webs) {
   rightPull = 0;
   var tension = parseFloat(document.getElementById("AutoTinput").value);
-  numbers= getAllNumbers(ids, webs);
+  numbers = getAllNumbers(ids, webs);
   var currentTension = standingTension(numbers);
-  if (tension<currentTension) {
+  if (tension < currentTension) {
     alert("The specified tension is too low for this setup and spot");
     return;
   }
-  dpull=numbers.spot.L/200;
-  while(currentTension<tension){
-    rightPull+=dpull;
+  dpull = numbers.spot.L / 200;
+  while (currentTension < tension) {
+    rightPull += dpull;
     currentTension = standingTension(getAllNumbers(ids, webs));
   }
-  dpull/=2;
-  for(let i=0;i<6;i++){   
-    if(currentTension<tension){
-      rightPull += dpull
+  dpull /= 2;
+  for (let i = 0; i < 6; i++) {
+    if (currentTension < tension) {
+      rightPull += dpull;
     } else {
-      rightPull -= dpull
+      rightPull -= dpull;
     }
     dpull /= 2;
     currentTension = standingTension(getAllNumbers(ids, webs));
@@ -395,11 +395,11 @@ function standingTension(numbers) {
   var standingT = Math.max(F1, F2) / 1000;
   return standingT;
 }
-function showStandingTension(standingT){
+function showStandingTension(standingT) {
   document.getElementById(
     "T"
   ).innerHTML = `Standing tension: ${standingT.toFixed(2)} kN`;
-  document.getElementById("AutoTinput").value=standingT.toFixed(2);
+  document.getElementById("AutoTinput").value = standingT.toFixed(2);
 }
 function getAllNumbers(ids, webs) {
   // Reconstruct the necessary data from the form
@@ -416,8 +416,10 @@ function getAllNumbers(ids, webs) {
     alert("Slackliner is not on the line.");
     return;
   }
-  if (sp<L/8 || sp>7*L/8){
-    alert("Slackliner is close to the anchors. The model assumes the rings don't slide so the result will not be accurate");
+  if (sp < L / 8 || sp > (7 * L) / 8) {
+    alert(
+      "Slackliner is close to the anchors. The model assumes the rings don't slide so the result will not be accurate"
+    );
   }
   var slacker = { w: sw, h: sh, l: sl, p: sp, b: sb };
   var sections = [];
@@ -1074,7 +1076,8 @@ function iterateEnergyY(
     );
   }
   // Do the dichotomy
-  var ymed = (ymax + ymin) / 2;
+  var ymed =
+    ((ymax * Emin + ymin * Emax) / (Emin + Emax) + (ymax + ymin) / 2) / 2;
   var Emed = getEtotal(
     x,
     ymed,
@@ -1116,7 +1119,7 @@ function fall(y0, spot, stretchCurves, leash, mSlacker, mLine, yLine) {
   console.log("E0:", E0);
   // runs from balance position down to find the point where become negative
   var ymax = yf;
-  var dy = Math.max(- spot.L / 100, -leash);
+  var dy = Math.max(-spot.L / 100, -leash);
   var ymin = yf + dy;
   var Eymin = getEtotal(
     xf,
