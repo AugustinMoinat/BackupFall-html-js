@@ -20,15 +20,15 @@ script-make-output.js creates the output for the user to see. It uses some asset
 
 ### The mathematical model
 
-To find balance points, the model uses Newton's interpolation with the 2D force field.
+To find balance points, the model uses Newton's interpolation with the 2D force field. 
 
 To find the bottom of a fall, the model uses Newton's interpolation with the potential energy field in the vertical direction, and the force field in the horizontal direction.
+
+Here's a <a href="https://augustinmoinat.github.io/BackupFall-html-js/Backup-fall%20simulator%20286b0f103f6742779e7860048e1a82d1.html">full explanation</a> of the maths and physics.
 
 ### Next steps
 
 I want to do real world tests to validate the model, or to know how much it is wrong. I believe it is a worst case fall every time - there is no loss of energy. But that has to be tested.
-
-I will also eventually make a publication on how the model works, for the nerds out there.
 
 There are a few functionnalities I'm already thinking about:
 - Implementing real stretch curves for webbing instead of linear (model difficulty 1/10; UI difficulty: 8/10)
