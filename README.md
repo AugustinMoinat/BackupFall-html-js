@@ -41,7 +41,7 @@ If you find that the app returns results that seem weird to you, please tell me 
 To reproduce the bug, I will need to know which webbings you are using, and what your setup is. Here's how to tell me exactly what I need to know:
 - Save your webbings to browser memory
 - Save your setup to browser memory
-- In Devtools, go to Application/LocalStorage to see the values (Tuto: <a href="https://developer.chrome.com/docs/devtools/storage/localstorage/">Chrome</a>,<a href="https://learn.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/storage/localstorage">Edge</a>, <a href="https://firefox-source-docs.mozilla.org/devtools-user/storage_inspector/local_storage_session_storage/index.html">Firefox</a>). Make sure to be in the right tab after checking the tuto.
+- In Devtools, go to Application/LocalStorage to see the values (Tuto: <a href="https://developer.chrome.com/docs/devtools/storage/localstorage/">Chrome</a>,<a href="https://learn.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/storage/localstorage">Edge</a>, <a href="https://firefox-source-docs.mozilla.org/devtools-user/storage_inspector/local_storage_session_storage/index.html">Firefox</a>). Make sure to be in the right tab after checking the tutorial.
 - Webbings are under the key "myWebbings". Copy-paste that string.
 - The set-up is under the key "mySetup<i>name_of_setup</i>". Copy paste also that string.
 - Add all additional information: sections of mainline that fail, spot, tension (method, and left and right webbing pulled), highliner's characteristics.

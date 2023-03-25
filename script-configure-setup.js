@@ -270,7 +270,6 @@ function loadSetup(name) {
 function deleteSetup(name) {
   // Local Storage - delete one setup in memory
   loadSetupList();
-  console.log(setupList);
   setupList.splice(setupList.indexOf(name), 1);
   localStorage.removeItem(keyset + name);
   updateSetupList();
@@ -284,7 +283,6 @@ function deleteAllSetups() {
     )
   ) {
     loadSetupList();
-    console.log(setupList);
     while(setupList.length>0) {
       var name=setupList.pop();
       deleteSetup(name);
