@@ -17,7 +17,6 @@ function doTheMaths(numbers) {
     numbers.spot.L,
     numbers.slacker.p
   );
-  backupgetstight = false;
   console.log("balance point");
   var balancepoint = solveStaticPos(
     numbers.spot,
@@ -28,6 +27,7 @@ function doTheMaths(numbers) {
     numbers.setupWeight + numbers.slacker.w
   );
   console.log(balancepoint);
+  backupgetstight = false;
   var F1balance =
     getF1(
       balancepoint[0],
@@ -61,7 +61,6 @@ function doTheMaths(numbers) {
       stretchCurves.rightStretchCurve
     ) / 1000;
   var backuptightbounce = backupgetstight;
-  backupgetstight = false;
   console.log("fall point");
   var fallpoint = fall(
     balancepoint[1] + numbers.slacker.b + numbers.slacker.h / 2,
@@ -76,6 +75,7 @@ function doTheMaths(numbers) {
     balancepoint[1]
   );
   console.log(fallpoint);
+  backupgetstight = false;
   var F1fall =
     getF1(
       fallpoint[2],
@@ -97,7 +97,6 @@ function doTheMaths(numbers) {
       right: stretchCurves.rightStretchCurve,
     }) / 1000;
   var backuptightfall = backupgetstight;
-  backupgetstight = false;
   console.log("backup fall");
   var backupFallpoint = fall(
     balancepoint[1] + numbers.slacker.b + numbers.slacker.h / 2,
@@ -113,6 +112,7 @@ function doTheMaths(numbers) {
   );
   console.log(backupFallpoint);
   console.log("finish");
+  backupgetstight = false;
   var F1max =
     getF1(
       backupFallpoint[2],
